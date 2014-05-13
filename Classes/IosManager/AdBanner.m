@@ -1,0 +1,31 @@
+//
+//  AdBanner.m
+//  puzzle
+//
+//  Created by FengZi on 14-3-3.
+//
+//
+
+#import "AdBanner.h"
+
+@implementation AdBanner
+
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        // Initialization code
+    }
+    return self;
+}
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect
+{
+    // Drawing code
+}
+*/
+
+@end
