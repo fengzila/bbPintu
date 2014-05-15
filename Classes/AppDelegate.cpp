@@ -48,7 +48,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 //    GameCenterApi::getInstance()->authenticateLocalUser();
     
     // Umeng
-    MobClickCpp::startWithAppkey("5347fa3f56240b0b0f001049");
+    MobClickCpp::startWithAppkey("533f4d2f56240b5a23090104");
 //    MobClickCpp::setLogEnabled(true);
     
     // create a scene. it's an autorelease object

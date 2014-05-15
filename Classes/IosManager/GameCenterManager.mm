@@ -201,11 +201,11 @@ static UIViewController* currentModalViewController = nil;
     NSURL *url;
     if ([[[UIDevice currentDevice] systemVersion] floatValue] < 7.0)
     {
-        url = [NSURL URLWithString:@"itms-apps://ax.itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=862898889"];
+        url = [NSURL URLWithString:@"itms-apps://ax.itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=876313246"];
     }
     else
     {
-        url = [NSURL URLWithString:@"itms-apps://itunes.apple.com/app/id862898889?at=10l6dK"];
+        url = [NSURL URLWithString:@"itms-apps://itunes.apple.com/app/id876313246?at=10l6dK"];
     }
     [[UIApplication sharedApplication] openURL:url];
 }
@@ -337,7 +337,15 @@ static UIViewController* currentModalViewController = nil;
     [[SKPaymentQueue defaultQueue] finishTransaction: transaction];
     
     MobClickCpp::event("Buy_Hint_Cancel");
-    //    NotificationCenter::getInstance()->postNotification("kIapCancel");
+//    NotificationCenter::getInstance()->postNotification("kIapCancel");
+    NotificationCenter::getInstance()->postNotification("kRefreshUI");
+    
+    NSString* strMsg = @"购买失败，请稍后再试。";
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"金手指*3" message:strMsg delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+    [alert show];
+    [alert release];
+    
+    MobClickCpp::event("Buy_Hint_Success");
     NotificationCenter::getInstance()->postNotification("kRefreshUI");
 }
 
@@ -350,20 +358,18 @@ static UIViewController* currentModalViewController = nil;
 // 提供产品
 - (void) provideContent: (NSString*)identifier
 {
-    
-    
     NSString* strMsg;
     if ([identifier compare:@"goldFingerX3"] == 0) {
-        strMsg = @"You have successfully purchased a 3 gold finger. Enjoy game!";
+        strMsg = @"你已经成功购买三个金手指，纵情享受它吧！";
         BBGameDataManager::getInstance()->addCanUseTipsCount();
     }
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"3 Hint Pack" message:strMsg delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"金手指*3" message:strMsg delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
     [alert show];
     [alert release];
     
     MobClickCpp::event("Buy_Hint_Success");
     NotificationCenter::getInstance()->postNotification("kRefreshUI");
-    //    NotificationCenter::getInstance()->postNotification("kIapCancel");
+//    NotificationCenter::getInstance()->postNotification("kIapCancel");
 }
 
 

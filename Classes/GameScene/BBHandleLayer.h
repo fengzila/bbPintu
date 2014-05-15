@@ -94,7 +94,8 @@ private:
     void                mixBlockOneByOne();
     void                update(float dt);
     void                updateTimeLabel();
-    void                refresh(Ref* obj);
+    void                refresh();
+    void                refreshUI(Ref* obj);
     void                createCountDown();
     void                showBigTipsPic();
     void                menuBackCallback(Ref* pSender);

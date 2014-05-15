@@ -35,7 +35,9 @@ void BBGameDataManager::setThemeIdAndLevelId(int themeId, int levelId)
 
 void BBGameDataManager::addCanUseTipsCount()
 {
-    
+    UserDefault* ud = UserDefault::getInstance();
+    ud->setIntegerForKey("fingerLeftTimes", 3);
+    ud->flush();
 }
 
 void BBGameDataManager::setGameOverData(int star, int leftTime)

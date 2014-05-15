@@ -49,11 +49,6 @@ void BBTmpScene::initData()
     bgSpt->setScale(visibleSize.width/bgSpt->getContentSize().width, visibleSize.height/bgSpt->getContentSize().height);
     addChild(bgSpt);
     
-    auto *loadingLayer = Sprite::create("bg_main1.png");
-    loadingLayer->setPosition(Point(visibleSize.width/2, visibleSize.height/2));
-//    loadingLayer->setScale(visibleSize.width/loadingLayer->getContentSize().width, visibleSize.height/loadingLayer->getContentSize().height);
-    addChild(loadingLayer);
-    
     auto bgLogoSpt = Sprite::create("bg_logo.png");
     bgLogoSpt->setPosition(Point(visibleSize.width/2, visibleSize.height/2 + 100));
     addChild(bgLogoSpt);
@@ -62,7 +57,7 @@ void BBTmpScene::initData()
     loadingSpt->setScale(2.0);
     loadingSpt->setPosition(Point(visibleSize.width/2, visibleSize.height/2 - 50));
     loadingSpt->runAction(RepeatForever::create(RotateBy::create(1, -360)));
-    loadingLayer->addChild(loadingSpt);
+    addChild(loadingSpt);
     
     schedule(schedule_selector(BBTmpScene::goGmaeScene), 1);
 }
@@ -76,6 +71,7 @@ void BBTmpScene::goGmaeScene(float dt)
     
     if (levelId > 9) {
         themeId++;
+        levelId = 1;
     }
     
     if (themeId > 5) {

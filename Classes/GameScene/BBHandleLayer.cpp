@@ -35,7 +35,7 @@ BBHandleLayer::BBHandleLayer()
 BBHandleLayer::~BBHandleLayer()
 {
     m_blockArr->release();
-    NotificationCenter::getInstance()->removeObserver(this, "kRefresh");
+    NotificationCenter::getInstance()->removeObserver(this, "kRefreshUI");
 }
 
 bool BBHandleLayer::init()
@@ -117,9 +117,10 @@ void BBHandleLayer::initSprite()
     
     m_testLayer = LayerColor::create(Color4B(255, 0, 0, 255), 10, 10);
     
+    float screenScale = BBGameDataManager::getInstance()->getScreenScale();
     auto bgSpt = Sprite::create("bg_main.png");
     bgSpt->setPosition(Point(m_visibleSize.width/2, m_visibleSize.height/2));
-    bgSpt->setScale(m_visibleSize.width/bgSpt->getContentSize().width, m_visibleSize.height/bgSpt->getContentSize().height);
+    bgSpt->setScale(m_visibleSize.width/bgSpt->getContentSize().width/screenScale, m_visibleSize.height/bgSpt->getContentSize().height/screenScale);
     addChild(bgSpt);
     
     auto gridBgLayer = LayerColor::create(Color4B(255, 255, 255, 255), 620, 620);
@@ -156,7 +157,7 @@ void BBHandleLayer::initSprite()
     
     schedule(schedule_selector(BBHandleLayer::update), 1);
     
-    NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BBHandleLayer::refresh), "kRefresh", NULL);
+    NotificationCenter::getInstance()->addObserver(this, callfuncO_selector(BBHandleLayer::refreshUI), "kRefreshUI", NULL);
 }
 
 void BBHandleLayer::createBlocks()
@@ -340,21 +341,21 @@ void BBHandleLayer::showMenuLayer()
                                              "btn_resume.png",
                                              "btn_resume.png",
                                              CC_CALLBACK_1(BBHandleLayer::menuBackCallback, this));
-    resumeItem->setPosition(Point(m_visibleSize.width/2 - resumeItem->getContentSize().width/2 - m_visibleSize.width * .156, m_visibleSize.height * 4/6));
+    resumeItem->setPosition(Point(m_visibleSize.width/2 - resumeItem->getContentSize().width/2 - 100, m_visibleSize.height/2 + 200));
     resumeItem->setTag(4);
     
     auto *newItem = MenuItemImage::create(
                                           "btn_retry.png",
                                           "btn_retry.png",
                                           CC_CALLBACK_1(BBHandleLayer::menuBackCallback, this));
-    newItem->setPosition(Point(m_visibleSize.width/2, m_visibleSize.height * 4/6));
+    newItem->setPosition(Point(m_visibleSize.width/2, m_visibleSize.height/2 + 200));
     newItem->setTag(5);
     
     auto *homeItem = MenuItemImage::create(
                                            "btn_home.png",
                                            "btn_home.png",
                                            CC_CALLBACK_1(BBHandleLayer::menuBackCallback, this));
-    homeItem->setPosition(Point(m_visibleSize.width/2 + homeItem->getContentSize().width/2 + m_visibleSize.width * .156, m_visibleSize.height * 4/6));
+    homeItem->setPosition(Point(m_visibleSize.width/2 + homeItem->getContentSize().width/2 + 100, m_visibleSize.height/2 + 200));
     homeItem->setTag(6);
     
     m_soundItem = MenuItemToggle::createWithCallback(
@@ -364,7 +365,7 @@ void BBHandleLayer::showMenuLayer()
         NULL
                                                    
     );
-    m_soundItem->setPosition(Point(m_visibleSize.width/2 - m_soundItem->getContentSize().width/2 - m_visibleSize.width * .156, m_visibleSize.height * 3/6));
+    m_soundItem->setPosition(Point(m_visibleSize.width/2 - m_soundItem->getContentSize().width/2 - 100, m_visibleSize.height/2));
     m_soundItem->setTag(7);
     
     UserDefault* ud = UserDefault::getInstance();
@@ -391,14 +392,14 @@ void BBHandleLayer::showMenuLayer()
         m_musicItem->setSelectedIndex(1);
     }
 
-    m_musicItem->setPosition(Point(m_visibleSize.width/2, m_visibleSize.height * 3/6));
+    m_musicItem->setPosition(Point(m_visibleSize.width/2, m_visibleSize.height/2));
     m_musicItem->setTag(8);
     
     auto *rateItem = MenuItemImage::create(
                                            "btn_rate.png",
                                            "btn_rate.png",
                                            CC_CALLBACK_1(BBHandleLayer::menuBackCallback, this));
-    rateItem->setPosition(Point(m_visibleSize.width/2 + rateItem->getContentSize().width/2 + m_visibleSize.width * .156, m_visibleSize.height * 3/6));
+    rateItem->setPosition(Point(m_visibleSize.width/2 + rateItem->getContentSize().width/2 + 100, m_visibleSize.height/2));
     rateItem->setTag(9);
     
     Menu *menu = Menu::create(resumeItem, newItem, rateItem, homeItem, m_soundItem, m_musicItem, NULL);
@@ -631,6 +632,7 @@ void BBHandleLayer::showBigTipsPic()
 {
     m_shadeLayer = LayerColor::create(Color4B(0, 0, 0, 125), m_visibleSize.width, m_visibleSize.height);
     getParent()->addChild(m_shadeLayer);
+    m_shadeLayer->setScale(BBGameDataManager::getInstance()->getScreenScale());
 
     float sptWidth = 180.0f;
     int themeId = BBGameDataManager::getInstance()->getThemeId();
@@ -666,7 +668,7 @@ void BBHandleLayer::showBigTipsPic()
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, m_shadeLayer);
 }
 
-void BBHandleLayer::refresh(Ref* obj)
+void BBHandleLayer::refresh()
 {
     if (!m_blockAnimOver) {
         return;
@@ -699,6 +701,14 @@ void BBHandleLayer::refresh(Ref* obj)
 //    mixBlock();
 }
 
+void BBHandleLayer::refreshUI(Ref *ref)
+{
+    UserDefault* ud = UserDefault::getInstance();
+    int fingerLeftTimes = ud->getIntegerForKey("fingerLeftTimes", 3);
+    
+    m_fingerLeftTimesLabel->setString(__String::createWithFormat("%d", fingerLeftTimes)->getCString());
+}
+
 int BBHandleLayer::computeIndex(float x, float y)
 {
     if (x < m_relativeX || x > m_relativeX + m_blockLength * (m_col + 0) || y < m_relativeY || y > m_relativeY + m_blockLength * (m_row + 1)) {
@@ -729,6 +739,8 @@ bool BBHandleLayer::onTouchBegan(Touch *touch, Event * event)
         //判断触摸点是否在目标的范围内
         if (m_isUsingGoldFinger) {
             // 正在使用金手指
+            BBAudio::playEffect("select.mp3");
+            
             UserDefault* ud = UserDefault::getInstance();
             int fingerLeftTimes = ud->getIntegerForKey("fingerLeftTimes", 3);
             if (m_goldFingerId1 == 0) {
@@ -736,6 +748,9 @@ bool BBHandleLayer::onTouchBegan(Touch *touch, Event * event)
                 m_goldFingerFocusSpt->setOpacity(255);
                 m_goldFingerFocusSpt->setPosition(target->getPosition());
             } else {
+                if (((BBBlockSprite*)target)->getTag() == m_goldFingerId1) {
+                    return false;
+                }
                 m_goldFingerId2 = ((BBBlockSprite*)target)->getTag();
                 int index1 = m_goldFingerId1;
                 int index2 = m_goldFingerId2;
@@ -745,6 +760,12 @@ bool BBHandleLayer::onTouchBegan(Touch *touch, Event * event)
                 ud->setIntegerForKey("fingerLeftTimes", fingerLeftTimes - 1);
                 
                 m_fingerLeftTimesLabel->setString(__String::createWithFormat("%d", fingerLeftTimes-1)->getCString());
+                
+                if (checkOver()) {
+                    // 拼图成功 弹出结算面板
+                    m_isOver = true;
+                    showOverLayer();
+                }
             }
             return false;
         }
@@ -913,6 +934,7 @@ void BBHandleLayer::showOverLayer()
     
     m_shadeLayer = LayerColor::create(Color4B(0, 0, 0, 75), m_visibleSize.width, m_visibleSize.height);
     getParent()->addChild(m_shadeLayer);
+    m_shadeLayer->setScale(BBGameDataManager::getInstance()->getScreenScale());
     
     auto listener = EventListenerTouchOneByOne::create();
     listener->setSwallowTouches(true);
@@ -1037,7 +1059,7 @@ void BBHandleLayer::menuBackCallback(Ref* pSender)
             break;
         case 5:
             // 重玩
-            NotificationCenter::getInstance()->postNotification("kRefresh");
+            refresh();
             removeMenuLayer();
             break;
         case 6:
@@ -1116,7 +1138,7 @@ void BBHandleLayer::goldFingerBegin()
     {
         auto blockSpt = (BBBlockSprite*)spt;
         blockSpt->setScale(.985);
-        blockSpt->runAction(RepeatForever::create(Sequence::create(RotateBy::create(.03, -5), RotateBy::create(.06, 10), RotateBy::create(.03, -5), NULL)));
+        blockSpt->runAction(RepeatForever::create(Sequence::create(RotateBy::create(.03, -2.5), RotateBy::create(.06, 5), RotateBy::create(.03, -2.5), NULL)));
     }
 }
 

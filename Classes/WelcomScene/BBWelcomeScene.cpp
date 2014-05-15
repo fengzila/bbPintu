@@ -92,7 +92,7 @@ void BBWelcomeScene::initSprite()
     
     int themeId = BBGameDataManager::getInstance()->getThemeId();
     if (themeId != 0) {
-        addChild(BBLevelLayer::create(themeId));
+        themeLayer->addChild(BBLevelLayer::create(themeId));
     }
 }
 
@@ -110,6 +110,7 @@ void BBWelcomeScene::createCloud1()
         ((Sprite*)m_cloudLayer->getChildByTag(101))->removeFromParentAndCleanup(true);
         createCloud1();
     }),  NULL));
+    cloudSpt->setScale(BBGameDataManager::getInstance()->getScreenScale());
 }
 
 void BBWelcomeScene::createCloud2()
@@ -126,4 +127,5 @@ void BBWelcomeScene::createCloud2()
         ((Sprite*)m_cloudLayer->getChildByTag(102))->removeFromParentAndCleanup(true);
         createCloud2();
     }),  NULL));
+    cloudSpt->setScale(BBGameDataManager::getInstance()->getScreenScale());
 }

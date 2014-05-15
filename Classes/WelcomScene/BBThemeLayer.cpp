@@ -40,7 +40,7 @@ void BBThemeLayer::initData()
     m_visibleSize = Director::getInstance()->getVisibleSize();
     
     m_curPage = 1;
-    m_totalPages = 5;
+    m_totalPages = 6;
     m_picWidth = m_visibleSize.width;
     
     m_pageArr = __Array::create();
@@ -55,7 +55,6 @@ void BBThemeLayer::initData()
 
 void BBThemeLayer::initSprite()
 {
-    setScale(BBGameDataManager::getInstance()->getScreenScale());
     GameCenterApi::getInstance()->hiddenAdBanner();
     
     m_themeBgSpt = Sprite::create("bg_theme.png");
@@ -77,16 +76,17 @@ void BBThemeLayer::initSprite()
     for (int i = 1; i <= m_totalPages; i++) {
         //背景
         Sprite *spt = Sprite::create(String::createWithFormat("theme%d.png", i)->getCString());
+        spt->setScale(BBGameDataManager::getInstance()->getScreenScale());
         spt->setPosition(Point(m_visibleSize.width/2 + m_picWidth*(i-1), m_visibleSize.height/2));
         m_scrollViewContent->addChild(spt);
         
         UserDefault* ud = UserDefault::getInstance();
         int themeIdFramCache = ud->getIntegerForKey("themeId", 1);
         
-        if (i > themeIdFramCache) {
+        if (i > themeIdFramCache && i != m_totalPages) {
             auto lockSpt = Sprite::create("lock.png");
-            lockSpt->setPosition(Point(m_visibleSize.width/2 + m_picWidth*(i-1) + 150, m_visibleSize.height/2 - spt->getContentSize().height/2 + 90));
-            m_scrollViewContent->addChild(lockSpt);
+            lockSpt->setPosition(Point(spt->getContentSize().width * .815, spt->getContentSize().height * .215));
+            spt->addChild(lockSpt);
         } else {
             auto listener1 = EventListenerTouchOneByOne::create();
             listener1->setSwallowTouches(false);
@@ -122,7 +122,7 @@ void BBThemeLayer::createPageControl()
     
     for (int i = 0; i < m_totalPages; i++) {
         auto pageSpt = Sprite::create("page_light.png");
-        pageSpt->setPosition(Point(firstX + (singleLen + gap)*i, 80));
+        pageSpt->setPosition(Point(firstX + pageSpt->getContentSize().width/2 + (singleLen + gap)*i, m_visibleSize.height * .105));
         addChild(pageSpt);
         
         m_pageArr->addObject(pageSpt);
@@ -214,6 +214,9 @@ void BBThemeLayer::themeOnTouchMoved(Touch *touch, Event * event)
 
 void BBThemeLayer::themeOnTouchEnded(Touch *touch, Event * event)
 {
+    if (m_curPage > 5) {
+        return;
+    }
     
     Point location = Director::getInstance()->convertToGL(touch->getLocation());
     
@@ -247,6 +250,7 @@ void BBThemeLayer::showMenuLayer()
     Size visibleSize = Director::getInstance()->getVisibleSize();
     
     m_shadeLayer = LayerColor::create(Color4B(0, 0, 0, 195), visibleSize.width, visibleSize.height);
+    m_shadeLayer->setScale(BBGameDataManager::getInstance()->getScreenScale());
     auto listener = EventListenerTouchOneByOne::create();
     listener->setSwallowTouches(true);
     listener->onTouchBegan = [](Touch* touch, Event* event){return true;};
@@ -263,7 +267,7 @@ void BBThemeLayer::showMenuLayer()
              NULL
                                                      
      );
-    m_soundItem->setPosition(Point(visibleSize.width/2 - m_soundItem->getContentSize().width/2 - 100, visibleSize.height * 4/6));
+    m_soundItem->setPosition(Point(visibleSize.width/2 - m_soundItem->getContentSize().width/2 - 100, m_visibleSize.height/2 + 200));
     m_soundItem->setTag(2);
     
     m_musicItem = MenuItemToggle::createWithCallback(
@@ -274,14 +278,14 @@ void BBThemeLayer::showMenuLayer()
          
      );
     
-    m_musicItem->setPosition(Point(visibleSize.width/2 + m_musicItem->getContentSize().width/2 + 100, visibleSize.height * 4/6));
+    m_musicItem->setPosition(Point(visibleSize.width/2 + m_musicItem->getContentSize().width/2 + 100, m_visibleSize.height/2 + 200));
     m_musicItem->setTag(3);
     
     auto *closeItem = MenuItemImage::create(
                                            "setting_btn_ok.png",
                                            "setting_btn_ok.png",
                                            CC_CALLBACK_1(BBThemeLayer::menuCallback, this));
-    closeItem->setPosition(Point(visibleSize.width/2, visibleSize.height * 3/6));
+    closeItem->setPosition(Point(visibleSize.width/2, m_visibleSize.height/2));
     closeItem->setTag(4);
     
     UserDefault* ud = UserDefault::getInstance();

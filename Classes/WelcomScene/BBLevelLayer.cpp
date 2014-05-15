@@ -81,9 +81,9 @@ void BBLevelLayer::initData(int themeId)
 
 void BBLevelLayer::initSprite()
 {
-    if (BBGameDataManager::getInstance()->getScreenScale() == 2) {
-        setScale(.5);
-    }
+//    if (BBGameDataManager::getInstance()->getScreenScale() == 2) {
+//        setScale(.5);
+//    }
     GameCenterApi::getInstance()->hiddenAdBanner();
     
     auto bgSpt = Sprite::create("bg_main1.png");
@@ -209,7 +209,7 @@ void BBLevelLayer::createPageControl()
     
     for (int i = 0; i < m_totalPages; i++) {
         auto pageSpt = Sprite::create("page_light.png");
-        pageSpt->setPosition(Point(firstX + (singleLen + gap)*i, 80));
+        pageSpt->setPosition(Point(firstX + pageSpt->getContentSize().width/2 + (singleLen + gap)*i, 80));
         addChild(pageSpt);
         
         m_pageArr->addObject(pageSpt);
@@ -219,7 +219,7 @@ void BBLevelLayer::createPageControl()
                                              "btn_play.png",
                                              "btn_play_light.png",
                                              CC_CALLBACK_1(BBLevelLayer::menuBeginCallback, this));
-    btnPlaySpt->setPosition(Point(m_visibleSize.width * .5, m_visibleSize.width * .205));
+    
     btnPlaySpt->setScale(BBGameDataManager::getInstance()->getScreenScale());
     btnPlaySpt->setTag(2);
     
@@ -228,10 +228,16 @@ void BBLevelLayer::createPageControl()
     addChild(m_playMenu);
     
     m_lockSpt = Sprite::create("btn_lock.png");
-    m_lockSpt->setPosition(Point(m_visibleSize.width * .5, m_visibleSize.width * .205));
     m_lockSpt->setScale(BBGameDataManager::getInstance()->getScreenScale());
     addChild(m_lockSpt);
-
+    
+    if (BBGameDataManager::getInstance()->getScreenScale() == 1) {
+        btnPlaySpt->setPosition(Point(m_visibleSize.width * .5, m_visibleSize.width * .265));
+        m_lockSpt->setPosition(Point(m_visibleSize.width * .5, m_visibleSize.width * .265));
+    } else {
+        btnPlaySpt->setPosition(Point(m_visibleSize.width * .5, m_visibleSize.width * .205));
+        m_lockSpt->setPosition(Point(m_visibleSize.width * .5, m_visibleSize.width * .205));
+    }
 }
 
 void BBLevelLayer::refreshPageControl()
